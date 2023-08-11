@@ -1,0 +1,17 @@
+[package]
+name = "tests"
+version = "0.1.0"
+edition = "2018"
+
+[dev-dependencies]
+casper-contract = { version = "3.0.0", default-features = false }
+contract = { path = "../contract" }
+casper-execution-engine = "5.0.0"
+casper-engine-test-support = "5.0.0"
+casper-types = "3.0.0"
+casper-event-standard = "0.3.0"
+
+[features]
+default = ["std"]
+std = ["casper-contract/std"]
+
