@@ -23,7 +23,7 @@ The on-chain example code demonstrates the following patterns and capabilities o
 - Code on how to store and retrieve data with `Named Keys`.
 - Code on how to store and retrieve data with `Dictionary`.
 - The usage of events via [casper-event-standard](https://github.com/make-software/casper-event-standard). The Casper network does not support events natively, so they are implemented as a standalone library (using `Dictionary` under the hood).
-- The [tests package](https://www.notion.so/tests/) contains code snippets for working with contract calls, global storage, and events in the "vanilla" Casper test suite.
+- The [tests package](./tests/) contains code snippets for working with contract calls, global storage, and events in the "vanilla" Casper test suite.
 
 ## TypeScript client
 

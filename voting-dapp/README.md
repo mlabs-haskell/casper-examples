@@ -32,27 +32,27 @@
 
 ## Project description
 
-This is an example of full-stack project that implements some simple DAO contract. On-chain part is written with [Odra framework](https://odra.dev/docs/) that greatly simplifies contract writing, but also have some drawbacks (see [Contract on-chain and backend section](#contract-on-chain-and-backend)). User interaction happens through React application.
+This is an example of a full-stack project that implements a simple DAO contract. The on-chain part is written with the [Odra framework](https://odra.dev/docs/), which greatly simplifies contract writing but also has some drawbacks (see the [Contract on-chain and backend section](#contract-on-chain-and-backend)). User interaction occurs through a React application.
 
-After main contract is deployed on-chain users can:
+After the main contract is deployed on-chain, users can:
 
-- Create new proposals. Currently, proposal consists of some description and call to some arbitrary 3d-party contract. On-chain and backend parts do not have any limits on what contract endpoint with what arguments can be called. But frontend UI currently have some limitations on what arguments can be passed to the contract endpoint. For more details see [Contract frontend section](#contract-frontend).
-- Vote on created proposals. There are no restrictions at the moment and anybody can vote, but only one time per proposal. The initial idea was to allow user to vote according their stake represented by some ERC20 standard token, but it was omitted due to development time limitations.
-- Close voting. No access limits here currently too - anybody can close voting. If proposal receives majority of "YES" votes, contract call inside proposal will be executed, and the one who closes the voting will need to pay gas price for whatever was executed there.
+- Create new proposals. Currently, a proposal consists of a description and a call to some arbitrary 3rd-party contract. From on-chain and backend parts there are no limits on what contract entry point with what arguments can be called. However, the frontend UI currently has some limitations on what arguments can be passed to the contract entry point. For more details, see the [Contract frontend section](#contract-frontend).
+- Vote on created proposals. Currently, there are no access restrictions and anybody can vote, but only once per proposal. The initial idea was to allow users to vote according to their stake represented by some ERC20 standard token, but this was omitted due to development time limitations.
+- Close voting. There are no access limits currently - anybody can close voting. If a proposal receives a majority of "YES" votes, the contract call inside the proposal will be executed, and the person who closes the voting will need to pay the gas price to cover whatever was executed there.
 
 ## Repo structure
 
 ### 3d-party-contract
 
-Simple smart contract that will be used for the demo purposes. Contract is written in vanilla/default/low-level Casper. Directory also contains shell scripts to deploy this contract and query node using `casper-client` (analog of `cardano-cli`).
+Here, you will find a simple smart contract that will be used for demo purposes. The contract is written in vanilla/default/low-level Casper. The directory also contains shell scripts to deploy this contract and query the node using `casper-client` (analogous to `cardano-cli`).
 
 ### nctl-docker
 
-Docker image to start local private network using `nctl` tool provided by the Casper ecosystem. There are `Make` commands available to start, stop, restart network and to copy predefined funded keys. Keys are copied already into [nctl-docker/users](./nctl-docker/users/) directory, but if node version changes old keys may stop working. Node version is set through the [docker-compose file](./nctl-docker/docker-compose.yaml).
+This directory contains a Docker Compose setup to start a local private network using the `nctl` tool provided by the Casper ecosystem. There are `Make` commands available to start, stop, and restart the network, as well as to copy predefined funded keys. The keys are already copied into the [nctl-docker/users](./nctl-docker/users/) directory, but if the node version changes, the old keys may stop working. The node version can be set through the [docker-compose file](./nctl-docker/docker-compose.yaml).
 
 ### node-proxy
 
-TypeScript proxy server. Casper nodes require CORS. This proxy server solves the issue proxying requests from browser frontend. For more details see [Deploying the project section](#deploying-the-project).
+This TypeScript proxy server solves the issue of proxying requests from a browser frontend for Casper nodes that require CORS. For more details, please refer to the [Deploying the project section](#deploying-the-project).
 
 ### testnet-keys
 
