@@ -1,0 +1,6 @@
+voting/target/
+voting_bu/target/
+
+voting-js-sdk/.build/
+*/node_modules/
+voting-js-sdk/.vscode

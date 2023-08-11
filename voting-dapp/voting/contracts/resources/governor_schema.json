@@ -1,0 +1,119 @@
+{
+  "name": "Governor",
+  "entrypoints": [
+    {
+      "name": "init",
+      "is_mutable": true,
+      "args": [
+        {
+          "name": "name",
+          "ty": "String"
+        }
+      ],
+      "return_ty": "Unit"
+    },
+    {
+      "name": "get_name",
+      "is_mutable": false,
+      "args": [],
+      "return_ty": "String"
+    },
+    {
+      "name": "get_call_data",
+      "is_mutable": false,
+      "args": [
+        {
+          "name": "proposal_id",
+          "ty": "U64"
+        }
+      ],
+      "return_ty": {
+        "Tuple2": [
+          "String",
+          {
+            "Tuple2": [
+              "String",
+              "String"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "get_proposal",
+      "is_mutable": true,
+      "args": [
+        {
+          "name": "proposal_id",
+          "ty": "U64"
+        }
+      ],
+      "return_ty": "Any"
+    },
+    {
+      "name": "new_proposal",
+      "is_mutable": true,
+      "args": [
+        {
+          "name": "statement",
+          "ty": "String"
+        },
+        {
+          "name": "call_data",
+          "ty": {
+            "Tuple2": [
+              "String",
+              {
+                "Tuple2": [
+                  "String",
+                  "String"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "return_ty": "Unit"
+    },
+    {
+      "name": "last_proposal_id",
+      "is_mutable": false,
+      "args": [],
+      "return_ty": "U64"
+    },
+    {
+      "name": "vote_for",
+      "is_mutable": true,
+      "args": [
+        {
+          "name": "proposal_id",
+          "ty": "U64"
+        }
+      ],
+      "return_ty": "Unit"
+    },
+    {
+      "name": "vote_against",
+      "is_mutable": true,
+      "args": [
+        {
+          "name": "proposal_id",
+          "ty": "U64"
+        }
+      ],
+      "return_ty": "Unit"
+    },
+    {
+      "name": "finalize_voting",
+      "is_mutable": true,
+      "args": [
+        {
+          "name": "proposal_id",
+          "ty": "U64"
+        }
+      ],
+      "return_ty": "Unit"
+    }
+  ],
+  "events": []
+}

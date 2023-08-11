@@ -1,0 +1,29 @@
+{
+  "name": "TestNumber",
+  "entrypoints": [
+    {
+      "name": "init",
+      "is_mutable": true,
+      "args": [],
+      "return_ty": "Unit"
+    },
+    {
+      "name": "set_number",
+      "is_mutable": true,
+      "args": [
+        {
+          "name": "n",
+          "ty": "U32"
+        }
+      ],
+      "return_ty": "Unit"
+    },
+    {
+      "name": "get_number",
+      "is_mutable": true,
+      "args": [],
+      "return_ty": "U32"
+    }
+  ],
+  "events": []
+}

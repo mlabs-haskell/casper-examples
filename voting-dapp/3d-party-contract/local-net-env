@@ -1,0 +1,4 @@
+export PUB_HEX="../../nctl-docker/users/user-3/public_key_hex"
+export SECRET_KEY="../../nctl-docker/users/user-3/secret_key.pem"
+export NODE_ADDR="http://localhost:11101"
+export NETWORK="casper-net-1"

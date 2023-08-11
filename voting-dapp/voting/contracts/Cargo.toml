@@ -1,0 +1,28 @@
+[package]
+name = "contracts"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+casper-types = "3.0.0"
+odra = { version = "0.4.0", features = [], default-features = false }
+serde_json = { version = "1.0.103"}
+serde = { version = "1.0.171", features = ["derive"] }
+borsh = "0.10.3"
+hex = "0.4.3"
+
+[features]
+default = ["mock-vm"]
+mock-vm = ["odra/mock-vm"]
+casper = ["odra/casper"]
+casper-livenet = ["odra/casper-livenet"]
+
+[[bin]]
+name = "deploy"
+path = "bin/deploy.rs"
+required-features = ["casper-livenet"]
+
+[[bin]]
+name = "livenet-debug"
+path = "bin/livenet-debug.rs"
+required-features = ["casper-livenet"]

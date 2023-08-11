@@ -1,0 +1,3 @@
+[[contracts]]
+name = "governor"
+fqn = "contracts::governor::Governor"
