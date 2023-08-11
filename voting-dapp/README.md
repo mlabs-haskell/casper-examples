@@ -117,27 +117,31 @@ Currently, the contract does not use any Events.
 
 ## Contract frontend
 
-Frontend is React application written in TypeScript with very basic UI. This is my first experience both with React and TypeScrip, so I suspect some things there are "pretty suboptimal" 🙃.
+The frontend is a React application written in TypeScript with a very basic UI. This is my first experience with both React and TypeScript, so I suspect some things there are "pretty suboptimal" 🙃.
 
-Application uses [casper-js-sdk](https://github.com/casper-ecosystem/casper-js-sdk) to build ans submit deploys. `casper-js-sdk` related code mostly concentrated in the [GovernorClient.ts](./voting-frontend/src/GovernorClient.ts).
+The application uses the casper-js-sdk to build and submit deploys when calling contract entry points. The code related to casper-js-sdk is mostly concentrated in the [GovernorClient.ts](./voting-frontend/src/GovernorClient.ts) file.
 
 ### Signing
 
-It is possible to sign deploys either with Casper Wallet browser extension or with some known keys, see [CasperNetwork.ts](./voting-frontend/src/CasperNetwork.ts). To switch the way of signing use `USE_CASPER_WALLET` constant in [Settings.ts](./voting-frontend/src/Settings.ts). There are some hardcoded keys in [Utils.tsx](./voting-frontend/src/Utils.tsx) that are parsed from Base64 encoded secret key. Those keys were used for development and debugging. Adjust the module if needed. It is also possible to parse keys from `.pem` files using `casper-js-sdk`.
+It is possible to sign deploys using either the Casper Wallet browser extension or some known keys. For more information, refer to [CasperNetwork.ts](./voting-frontend/src/CasperNetwork.ts). To switch between the two methods of signing, use the `USE_CASPER_WALLET` constant in [Settings.ts](./voting-frontend/src/Settings.ts).
+
+In [Utils.tsx](./voting-frontend/src/Utils.tsx), there are some hardcoded keys that are parsed from a Base64 encoded secret key. These keys were used for development and debugging. Adjust the module if needed.
+
+It is also possible to parse keys from `.pem` files using `casper-js-sdk`.
 
 ## Deploying the project
 
-Thw following section describes the procedure for deploying the `Governor` contract on the testnet, creating a proposal that will call a 3rd-party contract, and voting on it.
+The following section provides instructions for deploying the `Governor` contract on the testnet, creating a proposal that will call a 3rd-party contract, and voting on it.
 
-Please read additional instructions in [Switching the network section](#switching-the-network) if you want to try to run project with the local private network, as Casper Wallet browser extension can not connect to the custom network and you will need Base64 encoded secret key or secret key `.pem` file to sign deploys. 
+For additional instructions on how to run the project with a local private network, please refer to the "Switching the network" section [here](#switching-the-network). Note that the Casper Wallet browser extension can not connect to a custom network, and you will need either a Base64 encoded secret key or a secret key `.pem` file to sign deploys.
 
 ### 'Resetting' contract state
 
-If you want to "reset" state of the contracts described below, just re-deploy them with the same account key. With [nctl-docker local network](./nctl-docker/) there is also [make command available](./Makefile) to reset the network.
+To reset the state of the contracts described below, simply redeploy them with the same account key. If you are using the [nctl-docker local network](./nctl-docker/), you can also use the [make command](./Makefile) to reset the private local network itself.
 
 ### Switching the network
 
-To switch current setup from the testnet several changes are required:
+Current setup is set to work with the `testnet`. To switch it to another network several changes are required:
 
 - Change data [.env file in contract dir](./voting/contracts/.env) to use correct network name, node address and proper key. E.g., [data for NCTL local network](./voting/contracts/.env.ln). `query-service` will copy and use this file if started via `make` command.
 - Change [frontend settings](./voting-frontend/src/Settings.ts) accordingly. Important: for `NODE_URL` change only the part after the proxy url, e.g. for NTCL docker setup it will be `NODE_URL = 'http://localhost:3001/http://localhost:11101'`, and if you are using local network, then switch `USE_CASPER_WALLET` to `false`, as Casper Wallet extension can not connect to the custom network - deployments will be auto-signed with the key from [Utils.theKeys()](./voting-frontend/src/Utils.tsx#9)
@@ -148,15 +152,17 @@ To switch current setup from the testnet several changes are required:
 
 #### Step 1 - keys
 
-To deploy on testnet you will need keys. Keys can be created from Casper Waller browser extension, or using [casper-client](https://docs.casper.network/concepts/accounts-and-keys/). Keys created with Casper client can be imported to Casper Wallet browser extension. 
+To deploy on the testnet, you will need keys. Keys can be created using the Casper Waller browser extension or the [casper-client](https://docs.casper.network/concepts/accounts-and-keys/). Keys created with the Casper client can be imported to the Casper Wallet browser extension.
 
-One secret key `.pem` file will be required to deploy the main contract with the current setup. It is possible to download keys from Casper Wallet browser extension if needed.
+To deploy the main contract with the current setup, you will need one secret key `.pem` file. It is possible to download keys from the Casper Wallet browser extension if needed.
 
-After keys are created and added to Casper Wallet you can use [faucet](https://testnet.cspr.live/tools/faucet) to request funds (only one request per address is allowed).
+After keys are created and added to the Casper Wallet, you can use the [faucet](https://testnet.cspr.live/tools/faucet) to request funds (only one request per address is allowed).
 
-There are some funded keys awaitable in the repo in [testnet-keys dir](./testnet-keys/).
+If necessary, there are some funded keys available in the [testnet-keys directory](./testnet-keys/) of the repository.
 
- It is required step as Casper Wallet will be used to sign deployments.
+It is a required step because the Casper Wallet will be used to sign deployments.
+
+Current state of the repo already has everything set up and keys should still have enough funds for experiments.
 
 #### Step 2 - build and test
 
@@ -166,15 +172,15 @@ cd voting
 make test-w-casper
 ```
 
-There should be no errors.
+There should be no errors reported.
 
 #### Step 3 - prepare environment
 
 Setup Odra `livenet` environment.
 
-Odra `livenet` feature allows you to deploy and call contracts on the real network right from еру Rust project. Path to the secret key, node url and network name are specified through the [.env file](./voting/contracts/.env). The file is currently set for testnet. `http://94.130.10.55:7777` is the RPC endpoint for some known public node running on testnet.
+Odra `livenet` feature allows developer to deploy and call contracts on the real network right from the Rust project. Path to the secret key, node url and network name are specified through the [.env file](./voting/contracts/.env). The file is currently set for testnet. `http://94.130.10.55:7777` is the RPC endpoint for some known public node running on testnet.
 
-The is also example for `nctl` docker local network setup in `.env.ln`
+There is also an example of the Docker local network setup in the `.env.ln` file.
 
 #### Step 4 - deploy governor
 
@@ -185,8 +191,7 @@ You should be in the `voting` directory.
 ```
 make deploy-via-livenet
 ```
-
-If everything went OK you should see output like this:
+If everything went OK, you should see output like this:
 
 ```
 💁  INFO : Deploying "governor.wasm".
@@ -199,9 +204,9 @@ If everything went OK you should see output like this:
 💁  INFO : Contract "hash-d5e09f8a3836faf50dd0fc416784818ab17da481d6e3f3b2e01539270432b0cc" deployed.
 ```
 
-You can check deployment hash and contract hash via https://testnet.cspr.live (deploy hash is printed to the terminal in messages like `WAIT : Waiting 15s for "..."`).
+You can check the deployment hash and contract hash by visiting [https://testnet.cspr.live](https://testnet.cspr.live/). To find the deployment hash, look for messages like `WAIT: Waiting 15s for "..."` in the terminal.
 
-During contract deployment `governor.json` file will be created in the `voting` directory. This file will contain contract package hash (but not contract hash - this is important and will be explained down the road). This file will be used by `query-service` so frontend can query it and figure out what contract to call. It was made mostly to speed up develop-debug loop.
+During contract deployment, a `governor.json` file will be created in the `voting` directory. This file will contain the contract package hash, but not the contract hash (which will be explained later). The `query-service` will use this file so that the frontend can query it and determine which contract to call. This was primarily designed to speed up the development-debugging loop.
 
 #### Step 5 - query service
 
@@ -217,19 +222,20 @@ make run-query-service
 
 #### Step 6 - node proxy
 
-Casper nodes require CORS. It was told by developers, that starting from version `1.5` cors will be removed, and it was indeed till `1.5.2`. At the current moment testnet nodes run `1.5.2`, so CORS is back.
+Casper nodes require CORS. Developers had previously stated that starting from version `1.5`, CORS would be removed, and this was the case until `1.5.2`. The current testnet nodes run on `1.5.2`, so CORS is back.
 
-The easiest way to deal with CORS I;ve found at least for development, is to use small TS server with `cors-anywhere`.
+The easiest way to deal with CORS I've found, at least for development, is to use a small TS server with `cors-anywhere`.
 
-You can see in the frontend repo in [Settings.ts](./voting-frontend/src/Settings.ts) `NODE_URL` is specified as an url for proxy server with node url as an argument. This allows to use node  and contract clients provided by `casper-js-sdk` as is at the fronted w/o writing whole bunch of own code.
 
-Perhaps, this proxy can be merged with `query-service`, but if Odra team will release `WASM` contract client mentioned in `Other possible variants` of [Odra cons section](#odra-cons), there will be no need in `query-service`. So I went with standalone proxy for now.
+In the frontend settings, `NODE_URL` is specified as the URL for the proxy server with the node URL as an argument, see the [Settings.ts](./voting-frontend/src/Settings.ts) file. This allows to use node and contract clients provided by `casper-js-sdk` "as is" at the fronted w/o writing whole bunch of own code.
 
-Leave it running.
+Perhaps this proxy can be merged with the `query-service`. But if Odra team releases the `WASM` contract client (see `Other possible variants` section of the [Odra cons section](#odra-cons)), there will be no need for `query-service`. For now, a standalone proxy is used.
+
+Make sure to leave it running.
 
 #### Step 7 - frontend
 
-Switch to [voting-frontend dir](./voting-frontend/).
+To start the frontend, open the terminal in the [voting-frontend directory](./voting-frontend/).
 
 Run
 
@@ -237,29 +243,29 @@ Run
 npm start
 ```
 
-or to prevent default browser launch
+or, to prevent default browser launch
 
 ```
 BROWSER="none" npm start 
 ```
 
-Frontend app will start at `http://localhost:3000/`. You should see couple text fields and form with button there.
+The frontend app will start at `http://localhost:3000/`. You should see a couple of text fields and a form with a button there.
 
-Frontend requires governor contract deployed, `proxy` and `query-service` running. If you want to test contract execution, then `3d-party-contract` should be deployed also. If you followed all steps in order, everything should be prepared already.
+To use the frontend, the governor contract must be deployed and the `proxy` and `query-service` must be running. Additionally, to test the execution of arbitrary contracts, the `3d-party-contract` should be deployed. Let's move to it.
 
 #### Step 8 - 3d-party-contract
 
-3d-party contract can be used to test arbitrary contract execution as the result of voting. It is written in low-level Casper and mull code included for reference in [main.rs file](./3d-party-contract/main.rs).
+A 3rd-party contract can be employed to test arbitrary contract execution as a result of voting. The contract is written in low-level Casper, and the full code is included for reference in the [main.rs file](./3d-party-contract/main.rs).
 
-The contract stores single variable on-chain that can be incremented by `counter_inc` entry point by desired amount. Amount is passed through entry point arguments.
+The contract stores a single variable on-chain that can be incremented by the `counter_inc` entry point. Amount to increment is passed through the entry point arguments.
 
-All interactions happens thorough shell scripts. Scripts use `casper-client` CLI tool, so you will need it installed.
+Network interactions for deploying and querying this contract occur through shell scripts. These scripts use the `casper-client` CLI tool, which must be installed on your system.
 
 Enter [3d-party-contract contract directory](./3d-party-contract/) in terminal.
 
-Pick user key to work with and initiate environment. E.g. running `source ./test-net-debug-user-env` will export environment variable for testnet node and secret key that have some casper funds - it was used for debugging.
+Pick user key to work with and initiate environment. E.g. running `source ./test-net-debug-user-env` will export environment variables for the testnet node and secret key that have some casper funds.
 
-Call deployment with
+Start deployment with
 
 ```
 ./deploy-contract.sh
@@ -278,7 +284,9 @@ You should see something like this:
 }
 ```
 
-Now you can check deploy hash either via `testnet.cspr.live` or by calling `./get-deploy.sh "THE_HASH"`. `testnet.cspr.live` shows you the status in UI. In case of  `./get-deploy.sh ...` seek for `execution_results` key. First `result` in array will contain either `Success` or `Failure`. `Failure` usually contains the reason.
+Now you can check the deploy hash either via `testnet.cspr.live` or by calling `./get-deploy.sh "THE_HASH"`.
+
+With `testnet.cspr.live`, the current deployment status can be viewed in the UI. If using `./get-deploy.sh ...`, look for the `execution_results` key. The first `result` in the array will contain either `Success` or `Failure`. If it's `Failure`, the reason is usually included.
 
 Now we can query account to figure out Contract package hash - we will need it:
 
@@ -293,37 +301,34 @@ Look `named_keys` for something like this:
   "name": "counter_package_hash"
 }
 ```
-
-This is the hash we will need later.
-
 (Leave this terminal open - we will need it 🙂)
 
 #### Step 9 - interact with the contract
 
-After frontend is launched, 1st thing you should to is to click `Init` button. Then following happens:
+After launching the frontend and deploying the `3d-party-contract`, the first thing you should do int he frontend UI is click the `Init` button. When you do this, the following happens:
 
-- App will request access to Casper account and set required data to the state. Casper Wallet will open asking to choose and connect account. I had no time to implement account switching according to the events from Casper Waller SDK, so if account is switched - press `Init` again. Also, when page is refreshed you may need to click `Init` to set key again - this is my bad - lacking of experience and couldn't figure out how to make it better in the time I had. Also, sometimes I see error `CasperWalletProvider is not a function` - don't know the cause, page reload w/o cache helps.
-- After key is set application will make request to `query-service` to get `package hash` of the governor contract. Then it will use `CasperClient` from `casper-js-sdk` to find `contract hash` by `package hash`. For whatever reason `Contract` client from `casper-js-sdk` needs `contract hash` to call the contract, and fails with `package hash`. Casper natively support contracts upgrade, and different versions of contracts wit different hashes are "stored under" `package hash`. So user can call specific version of contract using `package hash` and version, or just call latest version with just `package hash`. Odra uses `package hash` to call contracts, `casper-client` can use both. But `casper-js-sdk` needs `contract hash`.
+- The app will request access to the Casper account and set the required data to the state. Casper Wallet will open and ask you to choose and connect your account. If you switch accounts, press `Init` again. Also, sometimes you may need to click `Init` again after refreshing the page to set the keys. This is a result of my lack of experience, and I couldn't figure out how to make it better in the time I had. Sometimes an error message may appear saying `CasperWalletProvider is not a function`. I'm not sure what causes this, but reloading the page without cache helps here.
+- After the key is set, the application will make a request to the `query-service` to get the `package hash` of the governor contract. Then it will use `CasperClient` from `casper-js-sdk` to find the `contract hash` using the `package hash`. For some reason, the `Contract` client from `casper-js-sdk` needs the `contract hash` to call the contract and fails with the `package hash`. Casper natively supports contracts upgrade, and different versions of contracts with different hashes are stored under the single `package hash`. So the user can call a specific version of the contract using the `package hash` and version, or just call the latest version with just the `package hash`. Odra uses the `package hash` to call contracts, and `casper-client` can use both. However, `casper-js-sdk` needs the `contract hash`.
 
-If everything went OK, you should see current public key hash, contract hash and package hash above of the form.
+If everything went well, you should see the current public key hash, contract hash, and package hash above the form.
 
-Now to the proposals. Using the below you can create proposals.
+Now, let's move on to the proposals. You can create proposals using the form below.
 
-From left to right you can specify (there is no validation there really):
+You can specify the following from left to right (there is no validation done here):
 
 - Proposal description
-- Information required to call external contract. This information will be stored on-chain as part of the proposal. Call will be executed if proposal receives majority of "YES" votes:
-  - Package hash of the contract. Remember, that Odra uses `package hash` to call contracts. So use hash acquired during [3d-party-contract-deploy](#step-8---3d-party-contract).
-  - Contract entry point to call. In case of `3d-party-contract` it will be `counter_inc`
-  - Argument for the entry point. `counter_inc` accepts number. I had no time to make it possible to pass any set of arguments supported by contract entry points though the form, so here arguments type is limited by `number`. There is no limits on smart contract side - it will accept any serialized arguments, that frontend will supply to it. But currently frontend code has only arguments required for `counter_inc` hardcoded - see [submit function in NewProposal.tsx](./voting-frontend/src/NewProposal.tsx).
+- Information required to call an external contract. This information will be stored on-chain as part of the proposal. The call will be executed if the proposal receives a majority of "YES" votes:
+    - Package hash of the contract. Remember that Odra uses the `package hash` to call contracts. So, use the hash acquired during [3d-party-contract-deploy]](#step-8---3d-party-contract).
+    - Contract entry point to call. In case of `3d-party-contract`, it will be `counter_inc`.
+    - Argument for the entry point. `counter_inc` accepts a number. I had no time to make it possible to pass any set of arguments supported by contract entry points through the form, so here arguments type is limited by `number`. There are no limits on the smart contract side - it will accept any serialized arguments that the frontend will supply to it. But currently, the frontend code has only arguments required for `counter_inc` hardcoded - see [submit function in NewProposal.tsx](./voting-frontend/src/NewProposal.tsx).
 
-After form is filled, click `Add Proposal`. It will ask you to sign deploy with Casper Wallet extension and then send deploy to the node. You can monitor the process in browser console, but alert will also popup when deployment will succeed or fail.
+After filling out the form, click on `Add Proposal`. This will prompt you to sign the deployment with the Casper Wallet extension and then send the deployment to the node. You can monitor the process in the browser console, but an alert will also pop up when the deployment succeeds or fails.
 
-When deploy is finished, you can refresh the page so app will query proposals. They should appear under the form. From here you can one on them (one vote per key) nad then finalize voting. If proposal received majority of "YES" votes, contract call stored inside the proposal will be execute. If it fails you will see an error and proposal will stay un-finalized (with current logic).
+Once the deployment is finished, you can refresh the page so that the app can query newly created proposals. Proposals should appear under the form. From here, you can vote on them (one vote per key) and then finalize the voting. If the proposal receives a majority of "YES" votes, the contract call stored inside the proposal will be executed. If it fails, you will see an error, and the proposal will remain unfinalized (with the current logic).
 
-If call to the `3d-party-contract` was used (and you don't have that many options with the current frontend 🙂) and it was executed during finalization, you can check if call to `3d-party-contract` was executed successfully.
+If a call to the `3d-party-contract` was used (and you don't have that many options with the current frontend 🙂) and it was executed during finalization, you can check if the call to the `3d-party-contract` was executed successfully.
 
-Go back to `3d-party-contract` directory and from there run:
+Go back to `3d-party-contract` terminal and from there run:
   
 ```
 ./query-state.sh "counter/count"
@@ -345,13 +350,13 @@ You should see something like this:
       "CLValue": {
         "bytes": "00000000",
         "cl_type": "I32",
-        "parsed": 0
+        "parsed": x
       }
     }
   }
 }
 ```
 
-The `"parsed": X` is what should change by the amount you specified in the proposal form.
+The `"parsed": X` is what should change by the amount you specified in the proposal form. During `3d-party-contract` deployment this value is set to `0`.
 
-Now you can create more proposal, vote on them and finalize them. Just don't forget to refresh the page, as it updates only fresh query response from `query-service` (and probably you'll need to click `Init` again after that - sorry).
+Now you can create more proposals, vote on them, and finalize them. Just remember to refresh the page, as it updates only with a fresh query response from the `query-service`. You may also need to click `Init` again after refreshing (sorry for the inconvenience).
