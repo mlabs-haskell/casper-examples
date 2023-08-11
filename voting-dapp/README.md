@@ -56,58 +56,64 @@ This TypeScript proxy server solves the issue of proxying requests from a browse
 
 ### testnet-keys
 
-Funded keys on `testnet` network. Can be imported into `Casper Wallet` browser extension.
+This directory contains funded keys on the `testnet` network. These keys can be imported into the Casper Wallet browser extension.
 
 ### voting
 
-Contains two Rust packages:
-- DAO smart contract and deployer for it implemented using Odra framework
-- Query service to query network global state related to the contract
+This directory contains two Rust packages:
+
+- A DAO smart contract with a deployer implemented using the Odra framework.
+- A query service that enables you to query the network's global state in relation to the contract's Context.
 
 For more details see [Contract on-chain and backend section](#contract-on-chain-and-backend)
 
 ### voting-frontend
 
-React app with basic UI that allows to create new proposals, vote on them and close them. See [Contract frontend section](#contract-on-chain-and-backend).
+Here, you will find a React app with a basic user interface that allows you to create new proposals, vote on them, and close them. See [Contract frontend section](#contract-on-chain-and-backend)for details.
 
 ## Contract on-chain and backend
 
-Smart contract is implemented using [Odra framework](https://odra.dev/docs/). Odra abstracts away all low-level Casper code. It also generates contract `Deployer` that provide reference object after contract is deployed. This reference object can be used to call contract entry points and query global state of the contract in tests and using real network.
+The Voting Smart contract is implemented using the [Odra framework](https://odra.dev/docs/), which abstracts away all low-level Casper code. Additionally, Odra generates a `Deployer` that provides a reference object after the contract is deployed. This reference object can be used to call contract entry points and query the global state of the contract in tests and using the real network.
 
 ### Odra framework
-A bigger example of using Odra framework in some core ecosystem project: [Casper DAO contracts](https://github.com/make-software/dao-contracts).
+For a more comprehensive example of using the Odra framework in a core ecosystem project see: [Casper DAO contracts](https://github.com/make-software/dao-contracts).
 
 #### Odra pros
 
-- A lot of low-level code is abstracted away. In bigger projects you will probably want to abstract out low-level Casper code anyway to not to write a lot of boilerplate. So Odra gives you that already.
-- Code looks more like plain Rust: contract is `struct` and contract endpoints are public methods of `impl`. All storage interactions also hidden behind `struct` fields that mimics regular types like variables of type `T`, lists, maps and etc..
-- Tests are kept in the same `.rs` file as in regular Rust code, not in the separate package like in "vanilla" casper examples. It is also possible to run tests either with Odra mock VM or with "official" casper mock VM. Odra tests gives slightly better error messages (but I'd go with Casper VM tests followed by E2E test on local private network as a final check).
-- `Deployer` is generated for each contract. It gives simple abstraction for calling contract entry points - they are called just as regular methods via dot-notation. `livenet` feature allows to deploy and call contract on real network.
-- Has events support build-in with some quality of life improvements (uses [casper-event-standard](https://github.com/make-software/casper-event-standard))
+- A lot of low-level code is abstracted away. In bigger projects, you will probably want to abstract out low-level Casper code anyway to avoid writing a lot of boilerplate. So Odra gives you that already.
+- Code looks more like plain Rust: the contract is a `struct` and contract endpoints are public methods of `impl`. Also, all storage interactions are hidden behind `struct` fields that mimic regular types like variables of type `T`, lists, maps, and so on.
+- Tests are kept in the same `.rs`, not in a separate package like in "vanilla" Casper examples. It is also possible to run tests either with Odra mock VM or with the "official" Casper mock VM. Odra tests give slightly better error messages, but for a final check, I would go with Casper VM tests followed by E2E test on a local private network.
+- `Deployer` is generated for each contract, providing a simple abstraction for calling contract entry points. They are called just like regular methods via dot-notation. The `livenet` feature allows deploying and calling contracts on a real network.
+- Has built-in support for events with some quality of life improvements (uses [casper-event-standard](https://github.com/make-software/casper-event-standard)).
 
 #### Odra cons
 
-Names of `NamedKeys` and `Dictionary` keys used to store data on-chain are not transparent. In case of low-level Casper code contract, developer defines set of string constants for `NamedKeys` names and name of the `Dictionaries` to use fro contract state. All that names can be found in the source code and checked on-chain. Odra from the other side stores whole contract state in a single `Dictionary` (currently it is called `state`) and names generation is hidden from the developer.
+Odra cons comes from the way it abstracts low-level Casper code. The framework generates names for `NamedKeys` and `Dictionary` keys used to store data on-chain. In low-level Casper code contracts, developers define a set of string constants for `NamedKeys` names and `Dictionaries` to use for storing contract state. Odra, on the other hand, stores the entire contract state in a single `Dictionary` (currently called `state`). Key names for this `Dictionary` are generated by Odra and this process is hidden from the developer.
 
-At the moment, if contract `struct` has `Variable`, the value is stored inside this `state` dictionary, and name for the key is generated by concatenating contract name with variable name and then converted to bytes and hashed. Hex-encoded hash is then used as a key in `state` `Dictionary`. If one contract has another contract as its field, then both contract names are concatenated and then variable name added to them, converted to bytes and hashed. If something is stored in the `Mapping`, then name of the field that is used for `Mapping` in contract `struct` becomes "dictionary" name, and when something is added into `Mapping`, contract name is concatenated with `Mapping` field name ("dictionary" name), converted to bytes and hashed, then the key that user uses to store the data in `Mapping` also converted to bytes and added to hash. Then hash is hex-encoded and resulted value used as a key name for on-chain `state` `Dictionary` (so it sort of like Redis keys namespaces, but also hashed).
+For version `v0.4.0`, if a contract `struct` has a `Variable`, the value is stored inside the `state` dictionary, not as a separate `Named Key`. The key for the dictionary is generated by concatenating the contract name with the variable name, converting the resulting string to bytes, and hashing it. The hex-encoded hash is then used as a key in the `state` `Dictionary`. If one contract has another contract as its field, both contract names are concatenated, and the variable name is added to them. The resulting string is converted to bytes and hashed. If something is stored in the `Mapping`, the algorithm is even more involved. The sources for how keys are created for variables and dictionary types like `Mapping` can be found [here](https://github.com/odradev/odra/blob/release/0.4.0/odra-casper/shared/src/key_maker.rs#L12) and [here](https://github.com/odradev/odra/blob/release/0.4.0/odra-casper/livenet/src/casper_client.rs#L397), respectively.
 
-Sources of how keys are made for v0.4.0 can be found [here](https://github.com/odradev/odra/blob/release/0.4.0/odra-casper/shared/src/key_maker.rs#L12) and [here](https://github.com/odradev/odra/blob/release/0.4.0/odra-casper/livenet/src/casper_client.rs#L397).
+The fact that the algorithm for generating keys is hidden from the contract developer and subject to change causes at least two problems:
 
-The problem is that algorithm of keys generation is hidden from the contract developer and is subject to change. It makes querying data from chain less straightforward. Although it is possible to recreate keys creation in, say, React application (and it was tested and worked), algorithm of key creation may change in the future (Odra devs also warn about this possibility).
+- Key names of the data stored on-chain are not transparent. When writing low-level Casper code, the developer defines the names explicitly, and these names can be inspected in the smart contract source code. If we query the contract state, we will see the same keys and dictionary names in the contract context. However, with Odra, we will only see a single dictionary called `state`.
+- Querying data from the smart contract becomes more difficult. To use `casper-js-sdk` or `casper-client`, we need to know the exact names for `Named Keys` and the `Dictionary`, as well as the string key for the `Dictionary` item to query. However, Odra does not expose generated key names to the developer in any way and does not allow developers to set their own names for variables.
 
-From the other side, it is possible to use `getters` in contract `impl` to read values from the contract `struct` fields. Odra will generate `Deployer` for each contract and "getter" methods will be available through the contract reference that `Deployer` returns after contract initialization. Those getters are just wrappers around JSON RPC requests to the node and does not require any gas to be called. Now the question is - how to get those getters available for the front-end.
+It is not clear how to fix the first issue, unless Odra allows custom keys to be set for contract variables.
 
-With current Odra version `0.4.0` there is no out-of-the box solution. Current solution was to write simple [web-service (query-service)](./voting/query-service/) that provides REST API on top of contract "getters".
+For the second issue, several approaches can work:
 
-Other possible variants:
-- In release `0.6.0` Odra team plans to add [WASM client](https://github.com/odradev/odra/issues/202) which will be auto-generated from the contract getters (or maybe straight from struct fields) and can be run in the browser.
-- Emit events when contract state changes. Those events can be indexed by some custom indexer and then front-end can query this indexer. Seems like [casper.cloud](https://cspr.cloud/) can become a general solution for it (it is probably one of results of the [casper-dao-middleware](https://github.com/make-software/casper-dao-middleware) development).
+- When using `casper-js-sdk` on the frontend, it is possible to replicate the way ODra generates keys in JS/TS code. This approach was tested for `v0.4.0` and worked, but the algorithm for key names generation can change, so this approach may require additional maintenance.
+- Add getters to your Odra contract for each field you want to query. Then, reference to the contract provided by autogenerated `Deployer` will also have this getters, and they can be called via dot-notation like contract entry points. Although under the hood, these getters will be interpreted as JSON RPC calls to the node that do not require any gas. The question now is how to make those getters available for the frontend. With the current Odra version `0.4.0`, there is no out-of-the-box solution. As a workaround, for this project a simple [web service (query-service)](./voting/query-service/) has been written to provide a REST API on top of the contract getters.
+
+Other possible ways to fix the query issue:
+
+- In release `0.6.0`, the Odra team plans to add a [WASM client](https://github.com/odradev/odra/issues/202) which will be auto-generated from the contract getters (or maybe straight from `struct` fields) and can be run in the browser.
+- Emit events when the contract state changes. Those events can be indexed by some custom indexer, and then the frontend can query this indexer. It seems like [casper.cloud](https://cspr.cloud/) can become a general solution for it (it is probably one of the results of the [casper-dao-middleware](https://github.com/make-software/casper-dao-middleware) development).
 
 ### Codebase
 
-The [root directory](./voting) of Contract on-chain and backend has own Makefile. Commands there allow to build contracts, test them both with Odra-mock and Casper VMs, build and run query service, deploy contract via Odra `livenet` feature and run E2E test. There will be more details on deployment in [Deploying the project section](#deploying-the-project).
+The Contract on-chain and backend have their own Makefile in the [root directory](./voting/). The commands provided there allow for building contracts, testing them with both Odra-mock and Casper VMs, building and running the query service, deploying contracts via Odra's `livenet` feature, and running E2E tests. For more details on deployment, please refer to the [Deploying the project section](#deploying-the-project).
 
-Currently contract does not use any Events.
+Currently, the contract does not use any Events.
 
 ## Contract frontend
 
