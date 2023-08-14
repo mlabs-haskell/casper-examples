@@ -148,6 +148,8 @@ Current setup is set to work with the `testnet`. To switch it to another network
 
 ### Testnet deploy
 
+A live demo of all the steps below can be found [here](https://drive.google.com/drive/folders/1JlgKBKud909-tkmrEbGPnjzzlrFM68ex?usp=sharing). 
+
 (Step 0: prepare a lot of terminals)
 
 #### Step 1 - keys
